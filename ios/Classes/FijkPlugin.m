@@ -62,7 +62,11 @@ static FijkPlugin *_instance = nil;
     FijkPlugin *instance = [[FijkPlugin alloc] initWithRegistrar:registrar];
     _instance = instance;
     [registrar addMethodCallDelegate:instance channel:channel];
-    [registrar addApplicationDelegate:instance];
+//    [registrar addApplicationDelegate:instance];
+    [[NSNotificationCenter defaultCenter] addObserver:instance
+                                             selector:@selector(applicationWillTerminate:)
+                                                 name:UIApplicationWillTerminateNotification
+                                               object:nil];
     // For receiving detachFromEngineForRegistrar.
     [registrar publish:instance];
 
@@ -74,6 +78,10 @@ static FijkPlugin *_instance = nil;
 
 + (FijkPlugin *)singleInstance {
     return _instance;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (instancetype)initWithRegistrar:
